@@ -6,6 +6,8 @@ import { scrapeStockNews } from './services/scrapperService.js';
 import { scrapeEconomicTimesNews } from './services/economicTimes.js';
 import { scrapeMarketNews } from './services/scrapeMarketNews.js';
 import { getMoneyControlNews } from './services/money-control/moneyControl.js';
+import { getMoneyControlStockNews } from './services/money-control/stock/stockNews.js';
+import { getMoneyControlOptionsNews } from './services/money-control/options/optionsNews.js';
 
 dotenv.config();
 
@@ -24,7 +26,9 @@ const PORT = process.env.PORT || 5000;
     // await scrapeStockNews();
     // await scrapeEconomicTimesNews();
     // await scrapeMarketNews();
-    await getMoneyControlNews();
+    // await getMoneyControlNews();
+    // await getMoneyControlStockNews();
+    await getMoneyControlOptionsNews();
     console.log(`\n✅ Initial scraping completed.\n`);
 })();
 

@@ -1,12 +1,17 @@
 export const sites = [
     {
-        name: 'MoneyControl',
-        url: 'https://www.moneycontrol.com/news/business/markets/',
-        selector: '.clearfix'
+        id: 'moneycontrol-market-news',
+        name: 'Money Control Market News',
+        url: 'https://www.moneycontrol.com/news/business/markets/'
     },
     {
-        name: 'Economic Times',
-        url: 'https://economictimes.indiatimes.com/markets',
-        selector: '.each-news-class'
-    }
+        id: 'moneycontrol-option-trading-news',
+        name: 'Money Control Option Trading News',
+        url: 'https://www.moneycontrol.com/news/tags/option-trading.html/'
+    },
+    {
+        id: 'moneycontrol-stock-news',
+        name: 'Money Control Stock News',
+        url: 'https://www.moneycontrol.com/news/business/stocks/',
+    },
 ];
