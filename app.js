@@ -14,11 +14,6 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Cron Job: Run every 10 seconds
-// cron.schedule('*/10 * * * * *', async () => {
-//     console.log(`\n⏰ [${new Date().toLocaleString()}] Running stock market news scraping...\n`);
-//     await scrapeStockNews();
-// });
 
 // ✅ Run it immediately once when the server starts
 (async () => {
@@ -32,8 +27,10 @@ const PORT = process.env.PORT || 5000;
     console.log(`\n✅ Initial scraping completed.\n`);
 })();
 
-// connectToDatabase()
-
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
+});
+
+app.get('/', (req, res) => {
+    res.send('Welcome to the News Scraper API');
 });
