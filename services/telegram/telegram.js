@@ -7,14 +7,19 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
 export async function sendTelegramMessage(message) {
+
+    // Check if the bot token and chat ID are set
+    // If not, log a warning and skip sending the message
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
         console.warn('Telegram bot token or chat ID is missing. Skipping message send.');
         return;
     }
 
+    // url to with tone to send message
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
     try {
+        // make a request to send message to chat id
         const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -24,13 +29,14 @@ export async function sendTelegramMessage(message) {
             }),
         });
 
+        // wait for response
         const data = await res.json();
 
+        // if data is not come or false then throw error
         if (!data.ok) {
             throw new Error(data.description);
         }
 
-        console.log('✅ Telegram message sent:', data.result.text);
     } catch (error) {
         console.error('❌ Error sending Telegram message:', error.message);
     }
