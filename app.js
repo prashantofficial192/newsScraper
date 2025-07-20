@@ -8,6 +8,7 @@ import { scrapeMarketNews } from './services/scrapeMarketNews.js';
 import { getMoneyControlNews } from './services/money-control/moneyControl.js';
 import { getMoneyControlStockNews } from './services/money-control/stock/stockNews.js';
 import { getMoneyControlOptionsNews } from './services/money-control/options/optionsNews.js';
+import { sendTelegramMessage } from './services/telegram/telegram.js';
 
 dotenv.config();
 
@@ -23,9 +24,12 @@ const PORT = process.env.PORT || 5000;
     // await scrapeMarketNews();
     // await getMoneyControlNews();
     // await getMoneyControlStockNews();
-    await getMoneyControlOptionsNews();
+    // await getMoneyControlOptionsNews();
     console.log(`\n✅ Initial scraping completed.\n`);
 })();
+
+// Send a Telegram message when server starts
+sendTelegramMessage('🚀 Server started successfully in ' + process.env.NODE_ENV + ' mode');
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
