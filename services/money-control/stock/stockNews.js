@@ -7,29 +7,66 @@ const browserHeaders = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
 };
 
+// async function getArticleContent(url) {
+//     try {
+//         const { data: articlePageHtml } = await axios.get(url, { headers: browserHeaders });
+//         const $$ = cheerio.load(articlePageHtml);
+
+//         // Target the main content container by its ID
+//         const contentContainer = $$('#contentdata');
+
+//         // IMPORTANT: Before extracting text, remove all known "junk" elements
+//         // like ads, related stories, videos, disclaimers, etc.
+//         contentContainer.find('script, style, .social_icons_wrapper, .mid-arti-ad, .related_stories_left_block, .taboolaClass, .maintextdiv, em, [id*="v-moneycontrol-"]').remove();
+
+//         // Join the text from all paragraph tags within the cleaned container
+//         const fullText = contentContainer.find('p').map((i, el) => $$(el).text().trim()).get().join('\n\n');
+
+//         // Final cleanup to ensure no excessive whitespace remains
+//         return fullText.replace(/\s\s+/g, ' ').trim() || "Content could not be scraped.";
+
+//     } catch (error) {
+//         console.error(`--> ERROR scraping article link ${url}: ${error.message}`);
+//         return "Failed to retrieve the full article content.";
+//     }
+// }
+
 async function getArticleContent(url) {
     try {
         const { data: articlePageHtml } = await axios.get(url, { headers: browserHeaders });
         const $$ = cheerio.load(articlePageHtml);
 
-        // Target the main content container by its ID
+        // Get published time
+        let publishedTime = '';
+        const scheduleDiv = $$('.article_schedule');
+        if (scheduleDiv.length > 0) {
+            publishedTime = scheduleDiv.text().replace(/\s+/g, ' ').trim(); // Clean extra spaces
+        }
+
+        // Target main content
         const contentContainer = $$('#contentdata');
 
-        // IMPORTANT: Before extracting text, remove all known "junk" elements
-        // like ads, related stories, videos, disclaimers, etc.
+        // Remove unwanted tags
         contentContainer.find('script, style, .social_icons_wrapper, .mid-arti-ad, .related_stories_left_block, .taboolaClass, .maintextdiv, em, [id*="v-moneycontrol-"]').remove();
 
-        // Join the text from all paragraph tags within the cleaned container
+        // Get article content
         const fullText = contentContainer.find('p').map((i, el) => $$(el).text().trim()).get().join('\n\n');
+        const cleanedContent = fullText.replace(/\s\s+/g, ' ').trim() || "Content could not be scraped.";
 
-        // Final cleanup to ensure no excessive whitespace remains
-        return fullText.replace(/\s\s+/g, ' ').trim() || "Content could not be scraped.";
+        return {
+            content: cleanedContent,
+            publishedTime: publishedTime || "Unknown",
+        };
 
     } catch (error) {
         console.error(`--> ERROR scraping article link ${url}: ${error.message}`);
-        return "Failed to retrieve the full article content.";
+        return {
+            content: "Failed to retrieve the full article content.",
+            publishedTime: "Unknown",
+        };
     }
 }
+
 
 export async function getMoneyControlStockNews() {
     try {
@@ -71,13 +108,23 @@ export async function getMoneyControlStockNews() {
         // console.log(articlesToScrape)
 
         // 3. Create an array of promises. Each promise will resolve with the full article details.
+        // const scrapePromises = articlesToScrape.map(async (article) => {
+        //     const content = await getArticleContent(article.link);
+        //     return {
+        //         ...article, // Keep original title, link, summary, source
+        //         content: content, // Add the full scraped content
+        //     };
+        // });
+
         const scrapePromises = articlesToScrape.map(async (article) => {
-            const content = await getArticleContent(article.link);
+            const { content, publishedTime } = await getArticleContent(article.link);
             return {
-                ...article, // Keep original title, link, summary, source
-                content: content, // Add the full scraped content
+                ...article,
+                content,
+                publishedTime, // Override list page time with article page time
             };
         });
+
 
         // 4. Run all scraping tasks in parallel and wait for them all to complete.
         const fullNewsData = await Promise.all(scrapePromises);

@@ -29,7 +29,7 @@ const PORT = process.env.PORT || 5000;
 })();
 
 // Send a Telegram message when server starts
-sendTelegramMessage('🚀 Server started successfully in ' + process.env.NODE_ENV + ' mode');
+// sendTelegramMessage('🚀 Server started successfully in ' + process.env.NODE_ENV + ' mode');
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on port ${PORT}`);
