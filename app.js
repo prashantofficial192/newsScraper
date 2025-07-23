@@ -9,6 +9,13 @@ import { getMoneyControlNews } from './services/money-control/moneyControl.js';
 import { getMoneyControlStockNews } from './services/money-control/stock/stockNews.js';
 import { getMoneyControlOptionsNews } from './services/money-control/options/optionsNews.js';
 import { sendTelegramMessage } from './services/telegram/telegram.js';
+import { getMoneyControlMarketNews } from './services/money-control/market/marketNews.js';
+import { getTechnicalAnalysisNews } from './services/money-control/technical-analysis/technicalAnalysisNews.js';
+import { getEconomyNews } from './services/money-control/economy/economyNews.js';
+import { getIpoNews } from './services/money-control/ipo/ipoNews.js';
+import { getCommoditiesNews } from './services/money-control/commodities/commoditiesNews.js';
+import { getMutualFundsNews } from './services/money-control/mutual-funds/mutualFundsNews.js';
+import { getPersonalFinanceNews } from './services/money-control/personal-finance/personalFinanceNews.js';
 
 dotenv.config();
 
@@ -25,6 +32,13 @@ const PORT = process.env.PORT || 5000;
     // await getMoneyControlNews();
     // await getMoneyControlStockNews();
     // await getMoneyControlOptionsNews();
+    // await getMoneyControlMarketNews();
+    // await getTechnicalAnalysisNews();
+    // await getEconomyNews();
+    // await getIpoNews();
+    // await getCommoditiesNews();
+    // await getMutualFundsNews();
+    // await getPersonalFinanceNews();
     console.log(`\n✅ Initial scraping completed.\n`);
 })();
 
