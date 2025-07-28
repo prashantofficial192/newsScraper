@@ -26,11 +26,8 @@ const PORT = process.env.PORT || 5000;
 // ✅ Run it immediately once when the server starts
 (async () => {
     console.log(`\n🚀 Running initial scraping on server start...\n`);
-    // await scrapeStockNews();
-    // await scrapeEconomicTimesNews();
-    // await scrapeMarketNews();
     // await getMoneyControlNews();
-    // await getMoneyControlStockNews();
+    await getMoneyControlStockNews();
     // await getMoneyControlOptionsNews();
     // await getMoneyControlMarketNews();
     // await getTechnicalAnalysisNews();
