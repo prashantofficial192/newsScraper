@@ -37,7 +37,7 @@ async function getArticleContent(url) {
             .get()
             .join('\n\n'); // Join all paragraphs
 
-        const cleanedContent = fullText.replace(/\s\s+/g, ' ').trim() || "Content could not be scraped.";
+        const cleanedContent = fullText.replace(/\s\s+/g, ' ').trim() || "Unable to scrape content.";
 
         // Return both content and published time
         return {
@@ -46,11 +46,8 @@ async function getArticleContent(url) {
         };
 
     } catch (error) {
-        console.error(`--> ERROR scraping article link ${url}: ${error.message}`);
-        return {
-            content: "Failed to retrieve the full article content.",
-            publishedTime: "Unknown",
-        };
+        // console.error(`--> ERROR scraping article link ${url}: ${error.message}`);
+        return "Failed to retrieve the full article content.";
     }
 }
 
@@ -71,17 +68,18 @@ export async function getIpoNews() {
 
         $(selector).each((index, element) => {
             const linkElement = $(element).find('h2 > a'); // News title link
-            const title = linkElement.attr('title');
+            const headline = linkElement.attr('title');
             const link = linkElement.attr('href');
-            const summary = $(element).find('p').first().text().trim(); // Short summary below title
+            const overview = $(element).find('p').first().text().trim(); // Short summary below title
 
             // If valid title and link found, store it
-            if (title && link) {
+            if (headline && link) {
                 articlesToScrape.push({
-                    title,
+                    headline,
                     link,
-                    summary,
+                    overview,
                     source: 'MoneyControl',
+                    tag: 'IPO News'
                 });
             }
         });
@@ -109,16 +107,15 @@ export async function getIpoNews() {
         // --- Final Result ---
         console.log(JSON.stringify({
             status: 'success',
-            source: 'MoneyControl-Full',
+            source: 'MoneyControl',
             timestamp: new Date().toISOString(),
-            count: fullNewsData.length,
+            length: fullNewsData.length,
             data: fullNewsData,
         }, null, 2));
 
         return fullNewsData;
 
     } catch (error) {
-        console.error('An unexpected error occurred during the scraping process:');
         console.error(error.message);
         return [];
     }

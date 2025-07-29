@@ -1,16 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cron from 'node-cron';
-import connectToDatabase from './config/newsDb.js';
-import { scrapeStockNews } from './services/scrapperService.js';
-import { scrapeEconomicTimesNews } from './services/economicTimes.js';
-import { scrapeMarketNews } from './services/scrapeMarketNews.js';
-import { getMoneyControlNews } from './services/money-control/moneyControl.js';
+// import connectToDatabase from './config/newsDb.js';
 import { getMoneyControlStockNews } from './services/money-control/stock/stockNews.js';
 import { getMoneyControlOptionsNews } from './services/money-control/options/optionsNews.js';
 import { sendTelegramMessage } from './services/telegram/telegram.js';
 import { getMoneyControlMarketNews } from './services/money-control/market/marketNews.js';
-import { getTechnicalAnalysisNews } from './services/money-control/technical-analysis/technicalAnalysisNews.js';
+// import { getTechnicalAnalysisNews } from './services/money-control/technical-analysis/technicalAnalysisNews.js';
 import { getEconomyNews } from './services/money-control/economy/economyNews.js';
 import { getIpoNews } from './services/money-control/ipo/ipoNews.js';
 import { getCommoditiesNews } from './services/money-control/commodities/commoditiesNews.js';
@@ -24,20 +20,46 @@ const PORT = process.env.PORT || 5000;
 
 
 // ✅ Run it immediately once when the server starts
-(async () => {
-    console.log(`\n🚀 Running initial scraping on server start...\n`);
-    // await getMoneyControlNews();
-    await getMoneyControlStockNews();
-    // await getMoneyControlOptionsNews();
-    // await getMoneyControlMarketNews();
-    // await getTechnicalAnalysisNews();
-    // await getEconomyNews();
-    // await getIpoNews();
-    // await getCommoditiesNews();
-    // await getMutualFundsNews();
-    // await getPersonalFinanceNews();
-    console.log(`\n✅ Initial scraping completed.\n`);
-})();
+// (async () => {
+//     console.log(`\n🚀 Running initial scraping on server start...\n`);
+//     await getMoneyControlOptionsNews(); // 1
+//     await getMoneyControlStockNews(); // 2
+//     await getMoneyControlMarketNews(); // 3
+//     await getEconomyNews(); // 4
+//     await getIpoNews(); // 5
+//     await getMutualFundsNews(); // 6
+//     await getCommoditiesNews(); // 7
+//     await getPersonalFinanceNews(); // 8
+//     // await getTechnicalAnalysisNews();
+//     console.log(`\n✅ Initial scraping completed.\n`);
+// })();
+
+// 🔁 Schedule the scraping to run every day at 7:15 AM
+cron.schedule('15 7 * * *', async () => {
+    try {
+        await sendTelegramMessage('🕖 Daily News Scraping started at 7:15 AM.');
+
+        console.log(`\n🔄 Scheduled scraping started...\n`);
+        await getMoneyControlOptionsNews(); // 1
+        await getMoneyControlStockNews();   // 2
+        await getMoneyControlMarketNews();  // 3
+        await getEconomyNews();             // 4
+        await getIpoNews();                 // 5
+        await getMutualFundsNews();         // 6
+        await getCommoditiesNews();         // 7
+        await getPersonalFinanceNews();     // 8
+        // await getTechnicalAnalysisNews(); // Optional
+
+        await sendTelegramMessage('✅ Daily News Scraping completed.');
+
+        console.log(`\n✅ Scheduled scraping completed.\n`);
+    } catch (err) {
+        console.error('❌ Error in scheduled scraping:', err);
+        await sendTelegramMessage('❌ Error occurred during scheduled news scraping.');
+    }
+});
+
+
 
 // Send a Telegram message when server starts
 // sendTelegramMessage('🚀 Server started successfully in ' + process.env.NODE_ENV + ' mode');

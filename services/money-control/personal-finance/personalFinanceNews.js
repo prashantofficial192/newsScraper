@@ -105,12 +105,13 @@ export async function getPersonalFinanceNews() {
         const fullNewsData = await Promise.all(scrapePromises);
 
         // --- Step 4: Filter out articles with unscripted content ---
-        const filteredNewsData = fullNewsData.filter(article => article.content !== "Content could not be scraped.");
+        const filteredNewsData = fullNewsData.filter(article => article.content !== "Unable to scrape content.");
 
 
         // --- Final Result ---
         console.log(JSON.stringify({
             status: 'success',
+            source: 'MoneyControl',
             timestamp: new Date().toISOString(),
             length: filteredNewsData.length,
             data: filteredNewsData,
