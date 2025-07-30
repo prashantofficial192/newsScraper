@@ -1,0 +1,29 @@
+name: Stock News Scraper
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # 8:30 AM IST
+    - cron: "0 6 * * *" # 11:30 AM IST
+    - cron: "0 9 * * *" # 2:30 PM IST
+    - cron: "0 12 * * *" # 5:30 PM IST
+    - cron: '30 4 * * *'   # 10:00 AM IST
+  workflow_dispatch: # Optional: allows manual run
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run app.js
+        run: node app.js
