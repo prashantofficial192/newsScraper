@@ -1,6 +1,6 @@
-import express from 'express';
+// import express from 'express';
 import dotenv from 'dotenv';
-import cron from 'node-cron';
+// import cron from 'node-cron';
 // import connectToDatabase from './config/newsDb.js';
 import { getMoneyControlStockNews } from './services/money-control/stock/stockNews.js';
 import { getMoneyControlOptionsNews } from './services/money-control/options/optionsNews.js';
@@ -15,8 +15,8 @@ import { getPersonalFinanceNews } from './services/money-control/personal-financ
 
 dotenv.config();
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+// const app = express();
+// const PORT = process.env.PORT || 5000;
 
 
 (async () => {
