@@ -19,21 +19,29 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 
-// ✅ Run it immediately once when the server starts
 (async () => {
-    console.log(`\n🚀 Running initial scraping on server start...\n`);
-    await sendTelegramMessage('🕖 Initial News Scraping started.');
-    await getMoneyControlOptionsNews(); // 1
-    await getMoneyControlStockNews(); // 2
-    await getMoneyControlMarketNews(); // 3
-    await getEconomyNews(); // 4
-    await getIpoNews(); // 5
-    await getMutualFundsNews(); // 6
-    await getCommoditiesNews(); // 7
-    await getPersonalFinanceNews(); // 8
-    // await getTechnicalAnalysisNews();
-    await sendTelegramMessage('✅ Initial News Scraping completed.');
-    console.log(`\n✅ Initial scraping completed.\n`);
+    try {
+        console.log(`🕖 Scheduled scraping started`);
+        await sendTelegramMessage('🕖 Scheduled scraping started');
+
+        await getMoneyControlOptionsNews();
+        await getMoneyControlStockNews();
+        await getMoneyControlMarketNews();
+        await getEconomyNews();
+        await getIpoNews();
+        await getMutualFundsNews();
+        await getCommoditiesNews();
+        await getPersonalFinanceNews();
+
+        await sendTelegramMessage('✅ Scheduled scraping completed');
+        console.log(`✅ Scheduled scraping completed`);
+    } catch (err) {
+        console.error('❌ Error:', err);
+        await sendTelegramMessage('❌ Scraper failed with error');
+        process.exit(1);
+    }
+
+    process.exit(0); // Important: Stop the script completely
 })();
 
 // 🔁 Schedule the scraping to run every day at 7:15 AM
@@ -66,10 +74,10 @@ const PORT = process.env.PORT || 5000;
 // Send a Telegram message when server starts
 // sendTelegramMessage('🚀 Server started successfully in ' + process.env.NODE_ENV + ' mode');
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`🚀 Server is running on port ${PORT}`);
+// });
 
-app.get('/', (req, res) => {
-    res.send('Welcome to the News Scraper API');
-});
+// app.get('/', (req, res) => {
+//     res.send('Welcome to the News Scraper API');
+// });
