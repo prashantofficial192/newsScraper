@@ -3,8 +3,8 @@ import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables (both local and deployed)
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7886338022:AAGr8qXX6llwvEi0HDRQtOCZDl7Qp8QoFxo';
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || '7144326560'
 
 export async function sendTelegramMessage(message) {
 
