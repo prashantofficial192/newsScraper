@@ -1,26 +1,7 @@
 name: Stock News Scraper
 
 on:
-  schedule:
-    - cron: "0 3 * * *" # 8:30 AM IST
-    - cron: "0 6 * * *" # 11:30 AM IST
-    - cron: "0 9 * * *" # 2:30 PM IST
-    - cron: "0 12 * * *" # 5:30 PM IST
-    - cron: '30 4 * * *'   # 10:00 AM IST
-    - cron: '37 4 * * *'   # 10:07 AM IST
-    - cron: '4 17 * * *'   # 10:34 PM IST (for testing)
-    - cron: '12 17 * * *' # 10:42 PM IST (for testing)
-    - cron: "28 17 * * *"   # 10:58 PM IST (for testing)
-    - cron: "40 16 * * *"   # 10:10 PM IST ← newly added
-    - cron: "45 16 * * *"   # 10:15 PM IST (new)
-    - cron: "0 17 * * *"    # 10:30 PM IST (newly added)
-    - cron: "7 17 * * *"    # 10:37 PM IST (newly added)
-    - cron: "10 17 * * *"   # 10:40 PM IST (newly added)
-  
-# Add this concurrency block
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: true
+  workflow_dispatch:  # Manual trigger only
 
 jobs:
   run-scraper:
@@ -33,7 +14,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '18'
 
       - name: Install dependencies
         run: npm install
