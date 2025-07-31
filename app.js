@@ -16,26 +16,14 @@ import { sendDiscordMessage } from './services/discord/discordNotifier.js';
         const now = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
         await sendDiscordMessage(`@everyone 🕖 Scheduled scraping started at ${now}`);
 
-        // ✅ 2. Run all scrapers individually (so failure in one doesn’t stop others)
-        const scrapers = [
-            getMoneyControlOptionsNews,
-            getMoneyControlStockNews,
-            getMoneyControlMarketNews,
-            getEconomyNews,
-            getIpoNews,
-            getMutualFundsNews,
-            getCommoditiesNews,
-            getPersonalFinanceNews,
-        ];
-
-        for (const scraper of scrapers) {
-            try {
-                await scraper();
-            } catch (err) {
-                console.error(`❌ Error in ${scraper.name}:`, err.message);
-                await sendTelegramMessage(`❌ Error in ${scraper.name}`);
-            }
-        }
+        await getMoneyControlOptionsNews();
+        await getMoneyControlStockNews();
+        await getMoneyControlMarketNews();
+        await getEconomyNews();
+        await getIpoNews();
+        await getMutualFundsNews();
+        await getCommoditiesNews();
+        await getPersonalFinanceNews();
 
         // ✅ 3. Final success alert
         const end = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
