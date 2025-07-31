@@ -12,6 +12,7 @@ on:
     - cron: '12 17 * * *' # 10:42 PM IST (for testing)
     - cron: "28 17 * * *"   # 10:58 PM IST (for testing)
     - cron: "40 16 * * *"   # 10:10 PM IST ← newly added
+    - cron: "45 16 * * *"   # 10:15 PM IST (new)
 
 jobs:
   run-scraper:
