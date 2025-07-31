@@ -11,6 +11,7 @@ on:
     - cron: '4 17 * * *'   # 10:34 PM IST (for testing)
     - cron: '12 17 * * *' # 10:42 PM IST (for testing)
     - cron: "28 17 * * *"   # 10:58 PM IST (for testing)
+    - cron: "40 16 * * *"   # 10:10 PM IST ← newly added
 
 jobs:
   run-scraper:
