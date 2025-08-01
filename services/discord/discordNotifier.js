@@ -1,6 +1,8 @@
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const DISCORD_WEBHOOK_URL = 'https://discord.com/api/webhooks/1400513044106313748/7rjJoazWaMFstQ6P_ZM_O9vtx4b9S5ymbdxqyw__rp7rTCR3I4ue2wfpYDS6OxCqn5wO';
+const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
 export async function sendDiscordMessage(message) {
     try {
@@ -15,7 +17,7 @@ export async function sendDiscordMessage(message) {
             throw new Error(`Failed to send message: ${res.status} ${errorText}`);
         }
 
-        console.log('✅ Message sent to Discord');
+        // console.log('✅ Message sent to Discord');
     } catch (error) {
         console.error('❌ Discord webhook error:', error.message);
     }

@@ -7,6 +7,10 @@ jobs:
   run-scraper:
     runs-on: ubuntu-latest
 
+    env:  # 👈 secrets here
+      MONGO_URI: ${{ secrets.MONGO_URI }}
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

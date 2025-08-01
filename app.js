@@ -17,13 +17,13 @@ import { sendDiscordMessage } from './services/discord/discordNotifier.js';
         await sendDiscordMessage(`@everyone 🕖 Scheduled scraping started at ${now}`);
 
         await getMoneyControlOptionsNews();
-        await getMoneyControlStockNews();
-        await getMoneyControlMarketNews();
-        await getEconomyNews();
-        await getIpoNews();
-        await getMutualFundsNews();
-        await getCommoditiesNews();
-        await getPersonalFinanceNews();
+        // await getMoneyControlStockNews();
+        // await getMoneyControlMarketNews();
+        // await getEconomyNews();
+        // await getIpoNews();
+        // await getMutualFundsNews();
+        // await getCommoditiesNews();
+        // await getPersonalFinanceNews();
 
         // ✅ 3. Final success alert
         const end = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
