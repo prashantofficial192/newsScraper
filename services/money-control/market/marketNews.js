@@ -1,9 +1,16 @@
 import axios from 'axios';
+import mongoose from 'mongoose';
 import * as cheerio from 'cheerio';
+import { sendDiscordMessage } from '../../discord/discordNotifier.js';
+import connectToDatabase from '../../../config/newsDb.js';
+import { newsSchema } from '../../../models/newsModel.js';
 import browserHeaders from '../../../config/browser-agent/browserAgent.js';
 
 // Main URL of the MoneyControl market news page
 const url = 'https://www.moneycontrol.com/news/business/markets/';
+
+// Create model for "marketNews" collection
+const MarketNews = mongoose.models.MarketNews || mongoose.model('MarketNews', newsSchema, 'marketNews');
 
 // Function to scrape full article content from an article page
 async function getArticleContent(url) {
@@ -54,15 +61,21 @@ async function getArticleContent(url) {
 // Main function to get latest market news from MoneyControl
 export async function getMoneyControlMarketNews() {
     try {
-        // --- Step 1: Fetch the news list page ---
+        // Step 1: Connect to DB
+        await connectToDatabase();
+
+        // Step 2: Send message to Discord before scraping market news
+        await sendDiscordMessage('3. Scraping Market News...');
+
+        // Step 3: Fetch the news list page
         const { data: listPageHtml } = await axios.get(url, { headers: browserHeaders });
 
-        // Load HTML for parsing
+        // Step 4: Load HTML for parsing
         const $ = cheerio.load(listPageHtml);
 
         const articlesToScrape = [];
 
-        // --- Step 2: Select only actual news articles ---
+        // Step 5: Select only actual news articles
         // Using ID pattern of "newslist-" to avoid ads or other non-news items
         const selector = '#cagetory > li[id^="newslist-"]';
 
@@ -90,7 +103,7 @@ export async function getMoneyControlMarketNews() {
             return [];
         }
 
-        // --- Step 3: Scrape content from each article page in parallel ---
+        // Step 6: Scrape content from each article page in parallel
         const scrapePromises = articlesToScrape.map(async (article) => {
             const { content, publishedTime } = await getArticleContent(article.link);
             return {
@@ -104,14 +117,37 @@ export async function getMoneyControlMarketNews() {
         // Wait for all scraping tasks to finish
         const fullNewsData = await Promise.all(scrapePromises);
 
+        // Step 7: Insert new articles into the database
+        const bulkInserts = [];
+
+        for (const article of fullNewsData) {
+            const exists = await MarketNews.exists({ link: article.link });
+            if (!exists) {
+                bulkInserts.push(article);
+            }
+        }
+
+        if (bulkInserts.length > 0) {
+            await MarketNews.insertMany(bulkInserts);
+            await sendDiscordMessage(`3. Inserted ${bulkInserts.length} new articles into the database.`);
+            // console.log(`✅ Inserted ${bulkInserts.length} new articles`);
+        } else {
+            // console.log("ℹ️ All articles already exist. Nothing new to insert.");
+            await sendDiscordMessage('ℹ️ All articles already exist. Nothing new to insert in marketNews collection')
+        }
+
+
+        // Step 8: Send message to Discord after scraping is completed
+        await sendDiscordMessage(`3. Market News Scraping completed with ${fullNewsData.length} articles.`);
+
         // --- Final Result ---
-        console.log(JSON.stringify({
-            status: 'success',
-            source: 'MoneyControl',
-            timestamp: new Date().toISOString(),
-            length: fullNewsData.length,
-            data: fullNewsData,
-        }, null, 2));
+        // console.log(JSON.stringify({
+        //     status: 'success',
+        //     source: 'MoneyControl',
+        //     timestamp: new Date().toISOString(),
+        //     length: fullNewsData.length,
+        //     data: fullNewsData,
+        // }, null, 2));
 
         return fullNewsData;
 

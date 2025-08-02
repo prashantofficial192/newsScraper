@@ -1,9 +1,16 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import mongoose from 'mongoose';
+import { sendDiscordMessage } from '../../discord/discordNotifier.js';
+import connectToDatabase from '../../../config/newsDb.js';
+import { newsSchema } from '../../../models/newsModel.js';
 import browserHeaders from '../../../config/browser-agent/browserAgent.js';
 
 // Main URL of the MoneyControl market news page
 const url = 'https://www.moneycontrol.com/news/business/personal-finance/';
+
+// Create model for "personalFinanceNews" collection
+const PersonalFinanceNews = mongoose.models.PersonalFinanceNews || mongoose.model('PersonalFinanceNews', newsSchema, 'personalFinanceNews');
 
 // Function to scrape full article content from an article page
 async function getArticleContent(url) {
@@ -54,15 +61,21 @@ async function getArticleContent(url) {
 // Main function to get latest market news from MoneyControl
 export async function getPersonalFinanceNews() {
     try {
-        // --- Step 1: Fetch the news list page ---
+        // Step 1: Connect to DB
+        await connectToDatabase();
+
+        // Step 2: Send message to Discord before scraping commodities news
+        await sendDiscordMessage('8. Scraping Personal Finance News...');
+
+        // Step 3: Fetch the news list page
         const { data: listPageHtml } = await axios.get(url, { headers: browserHeaders });
 
-        // Load HTML for parsing
+        // Step 4: Load HTML for parsing
         const $ = cheerio.load(listPageHtml);
 
         const articlesToScrape = [];
 
-        // --- Step 2: Select only actual news articles ---
+        // Step 5: Select only actual news articles
         // Using ID pattern of "newslist-" to avoid ads or other non-news items
         const selector = '#cagetory > li[id^="newslist-"]';
 
@@ -90,7 +103,7 @@ export async function getPersonalFinanceNews() {
             return [];
         }
 
-        // --- Step 3: Scrape content from each article page in parallel ---
+        // Step 6: Scrape content from each article page in parallel
         const scrapePromises = articlesToScrape.map(async (article) => {
             const { content, publishedTime } = await getArticleContent(article.link);
             return {
@@ -104,18 +117,41 @@ export async function getPersonalFinanceNews() {
         // Wait for all scraping tasks to finish
         const fullNewsData = await Promise.all(scrapePromises);
 
-        // --- Step 4: Filter out articles with unscripted content ---
+        // Step 7: Filter out articles with unscripted content
         const filteredNewsData = fullNewsData.filter(article => article.content !== "Unable to scrape content.");
+
+        // Step 8: Insert new articles into the database
+        const bulkInserts = [];
+
+        for (const article of filteredNewsData) {
+            const exists = await PersonalFinanceNews.exists({ link: article.link });
+            if (!exists) {
+                bulkInserts.push(article);
+            }
+        }
+
+        if (bulkInserts.length > 0) {
+            await PersonalFinanceNews.insertMany(bulkInserts);
+            await sendDiscordMessage(`8. Inserted ${bulkInserts.length} new articles into the database.`);
+            // console.log(`✅ Inserted ${bulkInserts.length} new articles`);
+        } else {
+            // console.log("ℹ️ All articles already exist. Nothing new to insert.");
+            await sendDiscordMessage('ℹ️ All articles already exist. Nothing new to insert in personalFinanceNews collection')
+        }
+
+
+        // Step 9: Send message to Discord after scraping is completed
+        await sendDiscordMessage(`8. Personal Finance News Scraping completed with ${fullNewsData.length} articles.`);
 
 
         // --- Final Result ---
-        console.log(JSON.stringify({
-            status: 'success',
-            source: 'MoneyControl',
-            timestamp: new Date().toISOString(),
-            length: filteredNewsData.length,
-            data: filteredNewsData,
-        }, null, 2));
+        // console.log(JSON.stringify({
+        //     status: 'success',
+        //     source: 'MoneyControl',
+        //     timestamp: new Date().toISOString(),
+        //     length: filteredNewsData.length,
+        //     data: filteredNewsData,
+        // }, null, 2));
 
         return fullNewsData;
 
